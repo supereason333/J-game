@@ -5,15 +5,25 @@ var Player_entry := preload("res://menu/player_data.tscn")
 @onready var list := $ScrollContainer/List
 
 func _enter_tree() -> void:
-	multiplayer.connect("peer_connected", add_player)
+	Server.player_list_changed.connect(set_list)
 
-func add_player(peer_id:int):
-	if !multiplayer.is_server(): return
-	return
-	var player_entry = Player_entry.instantiate()
-	player_entry.get_child(1).text = str(peer_id)
-	
+func _ready() -> void:
+	set_list()
+
+func set_list():
+	for child in list.get_children():
+		child.queue_free()
+	for player in Server.player_list:
+		add_player(player)
+
+func add_player(player:PlayerData):
+	var player_entry := Player_entry.instantiate()
 	list.add_child(player_entry)
+	
+	player_entry.username_label.text = player.username
+	player_entry.color_rect.color = player.color
+	player_entry.peer_id_label.text = str(player.peer_id)
+	player_entry.name = str(player.peer_id)
 
 func remove_player(peer_id:int):
 	pass

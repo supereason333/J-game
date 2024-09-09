@@ -1,21 +1,32 @@
 [gd_scene load_steps=2 format=3 uid="uid://c730b6i187ikw"]
 
-[sub_resource type="GDScript" id="GDScript_k7vcr"]
-script/source = "extends VBoxContainer
+[sub_resource type="GDScript" id="GDScript_opjkd"]
+script/source = "extends HBoxContainer
+
+@onready var username_label := $PlayerData/Username
+@onready var peer_id_label := $PlayerData/PeerID
+@onready var color_rect := $ColorRect
 "
 
-[node name="PlayerData" type="VBoxContainer"]
+[node name="PlayerData" type="HBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_k7vcr")
+script = SubResource("GDScript_opjkd")
 
-[node name="Username" type="Label" parent="."]
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="PlayerData" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Username" type="Label" parent="PlayerData"]
 layout_mode = 2
 text = "username"
 
-[node name="PeerID" type="Label" parent="."]
+[node name="PeerID" type="Label" parent="PlayerData"]
 layout_mode = 2
 text = "peer id"

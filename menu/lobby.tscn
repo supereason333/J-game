@@ -31,7 +31,3 @@ layout_mode = 2
 
 [node name="List" type="VBoxContainer" parent="PlayerList/ScrollContainer"]
 layout_mode = 2
-
-[node name="PlayerListSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://menu/player_data.tscn")
-spawn_path = NodePath("../PlayerList/ScrollContainer/List")
