@@ -11,7 +11,6 @@ const Player := preload("res://player.tscn")
 
 const DEFAULT_PORT := 9999
 const DEFAULT_ADDRESS := "localhost"
-var enet_peer = ENetMultiplayerPeer.new()
 
 """
 func _process(delta: float) -> void:
@@ -19,27 +18,6 @@ func _process(delta: float) -> void:
 		if multiplayer.get_peers().has(int(str(child.name))):
 			print(child.position)
 """
-
-func remove_player(peer_id):
-	for node in get_children():
-		if node.name == str(peer_id):
-			node.queue_free()
-
-func add_player(peer_id):
-	var player := Player.instantiate()
-	player.name = str(peer_id)
-	player.plr_color = player_color_picker.color
-	if username_entry.text == "":
-		player.plr_username = str(peer_id)
-	else:
-		player.plr_username = username_entry.text
-	add_child(player)
-
-func handle_connect(peer_id):
-	add_player(peer_id)
-
-func handle_disconnect(peer_id):
-	remove_player(peer_id)
 
 @rpc("any_peer")
 func add_bullet(peer_id, bullet_id, bullet_position, bullet_rotation):
@@ -52,39 +30,53 @@ func add_bullet(peer_id, bullet_id, bullet_position, bullet_rotation):
 	bullet.direction = Vector2(cos(bullet_rotation - PI/2), sin(bullet_rotation - PI/2)).normalized()
 	add_child(bullet)
 
-func host_server():
-	var port
-	if port_entry.text == "":
-		port = DEFAULT_PORT
-	else:
-		port = port_entry.text
+
+
+func remove_player(peer_id):
+	for node in get_children():
+		if node.name == str(peer_id):
+			node.queue_free()
+
+func add_player(peer_id):
+	var player := Player.instantiate()
+	var data := PlayerData.new()
+	data.peer_id = int(peer_id)
 	
-	enet_peer.create_server(port)
-	multiplayer.multiplayer_peer = enet_peer
+	player.name = str(peer_id)
+	player.data = data
+	
+	add_child(player)
+
+func handle_connect(peer_id):
+	var pdata := PlayerData.new()
+	
+	add_player(peer_id)
+	var peer = get_player_node(peer_id) as Node
+	
+	if !peer.is_multiplayer_authority(): 
+		peer.rpc("send_player_data")
+	else: 
+		peer.send_player_data()
+	#Server.add_player_list(get_player_node(peer_id).rpc("get_player_data"))
+
+func get_player_node(peer_id:int):
+	for node in get_children():
+		if str(node.name) == str(peer_id):
+			return node
+	
+	return
+
+func handle_disconnect(peer_id):
+	remove_player(peer_id)
+
+func _on_join_button_pressed() -> void:
+	Client.join_server()
+	main_menu.hide()
+
+func _on_host_button_pressed() -> void:
+	Server.host_server()
 	multiplayer.peer_connected.connect(handle_connect)
 	multiplayer.peer_disconnected.connect(handle_disconnect)
 	
 	handle_connect(multiplayer.get_unique_id())
-
-func join_server():
-	var port
-	var address
-	if address_entry.text == "":
-		address = DEFAULT_ADDRESS
-	else:
-		address = address_entry.text
-	if port_entry.text == "":
-		port = DEFAULT_PORT
-	else:
-		port = port_entry.text
-	
-	enet_peer.create_client(address, port)
-	multiplayer.multiplayer_peer = enet_peer
-
-func _on_join_button_pressed() -> void:
-	join_server()
-	main_menu.hide()
-
-func _on_host_button_pressed() -> void:
-	host_server()
 	main_menu.hide()

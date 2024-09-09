@@ -1,6 +1,6 @@
 extends Area2D
 
-const SPEED := 20.0
+const SPEED := 1500.0
 const DAMAGE := 10.0
 var direction := Vector2(1, 0)
 var peer_id:int
@@ -9,10 +9,9 @@ var active := true
 func _enter_tree() -> void:
 	set_multiplayer_authority(peer_id)
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if direction:
-		position += direction * SPEED
-
+		position += direction * SPEED * delta
 func _on_timer_timeout() -> void:
 	queue_free()
 

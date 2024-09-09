@@ -1,0 +1,16 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://fdwpyy0l4elb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s60kp"]
+bg_color = Color(0.775487, 0.259622, 0.238765, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gghbw"]
+bg_color = Color(0.192157, 0.741176, 0.2, 1)
+
+[resource]
+BoxContainer/constants/separation = 15
+MarginContainer/constants/margin_bottom = 15
+MarginContainer/constants/margin_left = 15
+MarginContainer/constants/margin_right = 15
+MarginContainer/constants/margin_top = 15
+ProgressBar/styles/background = SubResource("StyleBoxFlat_s60kp")
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_gghbw")
