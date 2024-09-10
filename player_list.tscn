@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=3 uid="uid://cvhijmvfl26t0"]
+
+[ext_resource type="Script" path="res://menu/player_list.gd" id="1_7geea"]
+
+[node name="PlayerList" type="PanelContainer"]
+offset_left = 232.0
+offset_top = 208.0
+offset_right = 696.0
+offset_bottom = 688.0
+script = ExtResource("1_7geea")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Players:"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ReadyButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ready!"
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "1/10"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ReadyButton" to="." method="_on_button_pressed"]

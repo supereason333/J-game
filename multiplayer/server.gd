@@ -2,8 +2,11 @@ extends Node
 
 signal new_player_connected
 signal player_list_changed
+signal started_game
+signal ended_game
 
 var player_list:Array[PlayerData]
+var ready_list:Array[Array]		# [[peer_id, status], [peer_id, status]]
 
 var enet_peer:ENetMultiplayerPeer
 
@@ -15,6 +18,7 @@ func host_server(port:int = 9999):
 		return
 	multiplayer.multiplayer_peer = enet_peer
 	multiplayer.peer_connected.connect(handle_connect)
+	multiplayer.peer_disconnected.connect(handle_disconnect)
 	
 	print("Server hosted on port " + str(port))
 	
@@ -24,10 +28,16 @@ func host_server(port:int = 9999):
 	add_player_list(Client.player_data)
 
 func handle_connect(peer_id):
-	print_debug(str(peer_id) +  " CONNECTED TO SERVER")
+	print(str(peer_id) +  " Connected to server")
 	emit_signal("new_player_connected")
 	Client.rpc("send_player_data")
 	#rpc("call_func_group_all_hosts", "player", "update_peer_status")
+
+func handle_disconnect(peer_id:int):
+	remove_from_player_list(peer_id)
+	remove_player_ready_list(peer_id)
+
+
 
 func add_player_list(data:PlayerData):
 	if !multiplayer.is_server(): return
@@ -89,12 +99,54 @@ func sync_player_list(peer_id:Array, username:Array, color:Array):
 	
 	emit_signal("player_list_changed")
 
+@rpc("any_peer", "call_local")
+func set_player_ready_status(peer_id:int, status:bool):
+	for i in ready_list:
+		if i[0] == peer_id:
+			i[1] = status
+			emit_signal("player_list_changed")
+			return
+	
+	ready_list.append([peer_id, status])
+	emit_signal("player_list_changed")
+
+@rpc("call_local")
+func remove_player_ready_list(peer_id:int):
+	for i in len(ready_list):
+		if ready_list[i][0] == peer_id:
+			ready_list.remove_at(i)
+	
+	emit_signal("player_list_changed")
+
 func get_player_list_player_index(peer_id:int) -> int:
 	for i in len(player_list):
 		if player_list[i].peer_id == peer_id:
 			return i
 	
 	return -1
+
+func get_ready_players() -> Array[int]:
+	var list:Array[int]
+	for i in ready_list:
+		if i[1] == true:
+			list.append(i[0])
+	
+	return list
+
+func get_unready_players() -> Array[int]:
+	var list:Array[int]
+	for i in ready_list:
+		if i[1] == false:
+			list.append(i[0])
+	
+	return list
+
+func get_player_ready_status(peer_id:int) -> bool:
+	for i in ready_list:
+		if i[0] == peer_id:
+			return i[1]
+	
+	return false
 
 func get_player_data_from_peer_id(peer_id:int):
 	var index = get_player_list_player_index(peer_id)
@@ -113,12 +165,11 @@ func receive_player_data(peer_id:int, username:String, color:Color):
 	
 	add_player_list(data)
 
-@rpc("call_local", "any_peer")
+@rpc("call_local", "any_peer", "reliable")
 func call_signal_all_hosts(sig:String):
-	#if !multiplayer.is_server(): return
-	print_debug("CALL SIGNAL ALL HOSTS")
+	#if !multiplayer.is_server(): return\
 	emit_signal(sig)
 
-@rpc("call_local", "any_peer")
+@rpc("call_local", "any_peer", "reliable")
 func call_func_group_all_hosts(group:String, function:String):
 	get_tree().call_group(group, function)

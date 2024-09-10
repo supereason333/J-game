@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://bq6nrtx1xppmt"]
+
+[ext_resource type="Script" path="res://game/game.gd" id="1_j6auu"]
+[ext_resource type="PackedScene" uid="uid://cfslptvrjkcrp" path="res://maps/map_testing.tscn" id="2_1a17i"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_j6auu")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://player.tscn")
+spawn_path = NodePath("..")
+
+[node name="MapTesting" parent="." instance=ExtResource("2_1a17i")]

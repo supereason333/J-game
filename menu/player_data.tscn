@@ -6,6 +6,7 @@ script/source = "extends HBoxContainer
 @onready var username_label := $PlayerData/Username
 @onready var peer_id_label := $PlayerData/PeerID
 @onready var color_rect := $ColorRect
+@onready var ready_label := $CenterContainer/ReadyLabel
 "
 
 [node name="PlayerData" type="HBoxContainer"]
@@ -30,3 +31,11 @@ text = "username"
 [node name="PeerID" type="Label" parent="PlayerData"]
 layout_mode = 2
 text = "peer id"
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+modulate = Color(1, 0, 0, 1)
+layout_mode = 2
+
+[node name="ReadyLabel" type="Label" parent="CenterContainer"]
+layout_mode = 2
+text = "Not ready"

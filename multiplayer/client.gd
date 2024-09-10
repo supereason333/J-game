@@ -5,6 +5,7 @@ signal connected_to_server
 var enet_peer:ENetMultiplayerPeer
 
 var player_data := PlayerData.new()
+var game_ready := false
 
 func join_server(port:int = 9999, address:String = "localhost"):
 	enet_peer = ENetMultiplayerPeer.new()

@@ -42,6 +42,7 @@ func add_player(peer_id):
 	var data := PlayerData.new()
 	data.peer_id = int(peer_id)
 	
+	player.position = Vector2(1000, 1000)
 	player.name = str(peer_id)
 	player.data = data
 	

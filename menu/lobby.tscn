@@ -1,7 +1,23 @@
-[gd_scene load_steps=3 format=3 uid="uid://c6gswwtw5gbnh"]
+[gd_scene load_steps=6 format=3 uid="uid://c6gswwtw5gbnh"]
 
+[ext_resource type="Theme" uid="uid://fdwpyy0l4elb" path="res://menu/themes/default_theme.tres" id="1_20jxk"]
 [ext_resource type="Script" path="res://menu/lobby.gd" id="1_123h0"]
-[ext_resource type="Script" path="res://menu/player_list.gd" id="2_bkll8"]
+[ext_resource type="PackedScene" uid="uid://cvhijmvfl26t0" path="res://player_list.tscn" id="2_os4ih"]
+[ext_resource type="PackedScene" uid="uid://dgbb3qx4mp1up" path="res://menu/player_chat.tscn" id="3_ejyed"]
+
+[sub_resource type="GDScript" id="GDScript_nbeeq"]
+script/source = "extends Button
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	if !multiplayer.is_server(): hide()
+
+func _on_pressed() -> void:
+	if !multiplayer.is_server(): return
+	
+	Server.rpc(\"call_signal_all_hosts\", \"started_game\")
+"
 
 [node name="Lobby" type="Control"]
 layout_mode = 3
@@ -10,24 +26,39 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_20jxk")
 script = ExtResource("1_123h0")
 
-[node name="Label" type="Label" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-text = "This is the lobby"
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="PlayerList" type="PanelContainer" parent="."]
-layout_mode = 0
-offset_left = 232.0
-offset_top = 208.0
-offset_right = 696.0
-offset_bottom = 688.0
-script = ExtResource("2_bkll8")
-
-[node name="ScrollContainer" type="ScrollContainer" parent="PlayerList"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="List" type="VBoxContainer" parent="PlayerList/ScrollContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
+
+[node name="StartButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Start game"
+script = SubResource("GDScript_nbeeq")
+
+[node name="VSplitContainer" type="VSplitContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PlayerList" parent="MarginContainer/HBoxContainer/VBoxContainer/VSplitContainer" instance=ExtResource("2_os4ih")]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PlayerChat" parent="MarginContainer/HBoxContainer/VBoxContainer/VSplitContainer" instance=ExtResource("3_ejyed")]
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/VBoxContainer/StartButton" to="MarginContainer/HBoxContainer/VBoxContainer/StartButton" method="_on_pressed"]
